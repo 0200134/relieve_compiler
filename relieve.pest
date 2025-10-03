@@ -1,0 +1,61 @@
+program = { SOI ~ definition* ~ EOI }
+
+// --- 정의 (Definitions) ---
+definition = { function_definition }
+
+// --- 함수 (Functions) ---
+function_definition = {
+def_keyword ~ identifier ~ "(" ~ parameter_list? ~ ")" ~ ":" ~ type_name ~ block
+}
+
+parameter_list = { (parameter ~ ("," ~ parameter)*) }
+parameter = { type_name ~ identifier }
+
+// --- 블록 (Blocks) ---
+block = { "{" ~ statement* ~ "}" }
+
+// --- 구문 (Statements) ---
+statement = { variable_declaration | assignment | function_call }
+assignment = { identifier ~ "=" ~ expression }
+
+// --- 변수 선언 (Variable Declaration) ---
+variable_declaration = { let_keyword ~ identifier ~ ":" ~ type_name ~ "=" ~ expression }
+
+// --- 표현식 (Expressions) ---
+expression = { literal | identifier | function_call }
+
+// --- 리터럴 (Literals) ---
+literal = { string_literal | integer_literal | boolean_literal }
+// 수정: 올바른 따옴표 사용 및 이스케이프 수정
+string_literal = { """ ~ (char | "\" ~ char)* ~ """ }
+integer_literal = @{ ASCII_DIGIT+ }
+boolean_literal = { "true" | "false" }
+
+// --- 함수 호출 (Function Calls) ---
+function_call = {
+identifier ~ "(" ~ expression_list? ~ ")"
+}
+expression_list = { (expression ~ ("," ~ expression)*) }
+
+// --- 타입 (Types) ---
+type_name = { identifier ~ array_brackets? }
+// 수정: 불필요한 이스케이프 제거
+array_brackets = { "[" ~ "]" }
+
+// --- 기본 요소 (Primitives) ---
+// 키워드
+def_keyword = { "def" }
+let_keyword = { "let" }
+
+// 일반적인 식별자 (변수 이름, 함수 이름, 타입 이름)
+// 수정: 시작 문자 ''를 ''로 변경하고 불필요한 이스케이프 제거
+identifier = @{ (ASCII_ALPHA | "") ~ (ASCII_ALPHANUMERIC | "_") }
+// 수정: 불필요한 이스케이프 제거
+char = { ASCII_ALPHANUMERIC | " " | "=" | "\t" }
+
+// --- 숨겨진 규칙 (Silent Rules) ---
+// Pest에서 자동으로 무시할 공백 및 주석 정의
+// 수정: 불필요한 이스케이프 제거
+WHITESPACE = _{ " " | "\t" | "\n" | "\r" }
+// 수정: 불필요한 이스케이프 제거
+COMMENT = _{ "//" ~ (!"\n" ~ ANY)* ~ "\n" }

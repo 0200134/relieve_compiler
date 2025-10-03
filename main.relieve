@@ -1,0 +1,4 @@
+def main(String[] args): Res
+{
+print_ln("Hello world")
+}
